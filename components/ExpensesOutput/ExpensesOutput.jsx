@@ -19,6 +19,4 @@ function ExpensesOutput({ expenses, expensesPeriod }) {
     );
 }
 
-const styles = StyleSheet.create({});
-
 export default ExpensesOutput;

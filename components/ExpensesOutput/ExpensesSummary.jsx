@@ -12,6 +12,4 @@ function ExpensesSummary({ periodName, expenses }) {
     )
 }
 
-const styles = StyleSheet.create({});
-
 export default ExpensesSummary;
