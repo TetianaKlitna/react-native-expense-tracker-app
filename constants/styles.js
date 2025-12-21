@@ -13,4 +13,14 @@ export const GlobalStyles = {
     gray500: '#39324a',
     gray700: '#221c30',
   },
+  shadow: {
+    // iOS shadow
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 2, height: 2 },
+    shadowRadius: 8,
+
+    // Android shadow
+    elevation: 3,
+  },
 };

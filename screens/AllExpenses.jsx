@@ -3,7 +3,7 @@ import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 
 function AllExpenses() {
   return (
-    <ExpensesOutput expenses={[]} expensesPeriod="Total" />
+    <ExpensesOutput expenses={[]} expensesPeriod="Total:" />
   );
 }
 
