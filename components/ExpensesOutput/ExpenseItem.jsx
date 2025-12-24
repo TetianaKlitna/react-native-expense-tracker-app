@@ -8,7 +8,6 @@ function ExpenseItem({ id, description, date, amount }) {
     const navigation = useNavigation();
 
     const expensePressHandler = () => {
-        console.log('Pressed expense with id:', id);
         navigation.navigate('ManageExpense', {
             expenseId: id,
         });
