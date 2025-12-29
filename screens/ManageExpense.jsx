@@ -1,62 +1,76 @@
 import { useLayoutEffect, useContext } from 'react';
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from 'react-native';
 import { GlobalStyles } from '../constants/styles';
 import IconButton from '../ui/IconButton';
 import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpenses/ExpenseForm';
+import { useExpenses } from '../hooks';
+import LoadingSpinner from '../ui/LoadingSpinner';
 
 function ManageExpense({ route, navigation }) {
     const { expenseId } = route.params || {};
     const isEditing = !!expenseId;
+
     const expensesCtx = useContext(ExpensesContext);
+    const { create, remove, update, loading, error } = useExpenses();
 
-    const expense = expensesCtx.expenses.find((expense) => expense.id === expenseId);
-
-    const confirmLabel = isEditing ? 'Edit' : 'Add';
+    const expense = expensesCtx.expenses.find(
+        (expense) => expense.id === expenseId
+    );
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: isEditing ? 'Edit Expense' : 'Add Expense'
+            title: isEditing ? 'Edit Expense' : 'Add Expense',
         });
     }, [navigation, isEditing]);
 
-    const deleteExpenseHandler = () => {
-        expensesCtx.deleteExpense({ id: expenseId });
-        navigation.goBack();
-    }
+    const deleteExpenseHandler = async () => {
+            await remove(expenseId);
+            expensesCtx.deleteExpense(expenseId);
+            navigation.goBack();
+    };
 
-    const cancelHandler = () => {
-        navigation.goBack();
-    }
-
-    const confirmHandler = ({ amount, date, description }) => {
+    const confirmHandler = async (expenseData) => {
         if (isEditing) {
-            expensesCtx.updateExpense({
-                id: expenseId,
-                description: description,
-                amount: amount,
-                date: date,
-            });
+            const updatedExpense = await update(expenseId, expenseData);
+            expensesCtx.updateExpense(expenseId, updatedExpense);
         } else {
-            expensesCtx.addExpense({
-                description: description,
-                amount: amount,
-                date: date,
-            });
+            const createdExpense = await create(expenseData);
+            expensesCtx.addExpense(createdExpense);
         }
-    navigation.goBack();
-}
 
-return (
-    <View style={styles.container}>
-        <ExpenseForm defExpanses={expense} onCancel={cancelHandler} onConfirm={confirmHandler} confirmLabel={confirmLabel} />
-        {isEditing && (
-            <View style={styles.deleteContainer}>
-                <IconButton icon="trash" color={GlobalStyles.colors.error500} size={36} onPress={deleteExpenseHandler} />
-            </View>
-        )}
-    </View>
-);
+        navigation.goBack();
+    };
+
+    if (loading) {
+        return <LoadingSpinner />;
+    }
+
+    if (error) {
+        return <Text>Error: {error.message}</Text>;
+    }
+
+    return (
+        <View style={styles.container}>
+            <ExpenseForm
+                defaultExpense={expense}
+                onCancel={() => navigation.goBack()}
+                onConfirm={confirmHandler}
+                confirmLabel={isEditing ? 'Edit' : 'Add'}
+            />
+
+            {isEditing && (
+                <View style={styles.deleteContainer}>
+                    <IconButton
+                        icon="trash"
+                        color={GlobalStyles.colors.error500}
+                        size={36}
+                        onPress={deleteExpenseHandler}
+                    />
+                </View>
+            )}
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -74,4 +88,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ManageExpense;   
+export default ManageExpense;

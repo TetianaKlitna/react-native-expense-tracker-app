@@ -5,19 +5,19 @@ import { getFormattedDate } from '../../util/date';
 import Input from './Input';
 import Button from '../../ui/Button';
 
-function ExpenseForm({ defExpanses, onCancel, onConfirm, confirmLabel }) {
+function ExpenseForm({ defaultExpense, onCancel, onConfirm, confirmLabel }) {
 
     const [inputValues, setInputValues] = useState({
         amount: {
-            value: defExpanses ? defExpanses.amount.toString() : '',
+            value: defaultExpense ? defaultExpense.amount.toString() : '',
             isValid: true,
         },
         date: {
-            value: defExpanses ? getFormattedDate(defExpanses.date) : '',
+            value: defaultExpense ? getFormattedDate(defaultExpense.date) : '',
             isValid: true,
         },
         description: {
-            value: defExpanses ? defExpanses.description : '',
+            value: defaultExpense ? defaultExpense.description : '',
             isValid: true,
         },
     });
