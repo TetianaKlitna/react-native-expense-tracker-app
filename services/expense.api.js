@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
 const instance = axios.create({
-    baseURL: 'https://expense-tracker-34f0e-default-rtdb.firebaseio.com',
+    baseURL: apiUrl,
     timeout: 10000,
 });
 
@@ -16,6 +18,7 @@ export async function storeExpense(expenseData) {
 }
 
 export async function fetchExpenses() {
+  console.log('Fetching expenses from API:', apiUrl);
     try {
         const res = await instance.get('/expenses.json');
 
