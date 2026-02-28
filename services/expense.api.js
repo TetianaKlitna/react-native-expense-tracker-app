@@ -1,47 +1,63 @@
-import axios from "axios";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "./firebase.config";
 
-const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const expensesCollection = collection(db, "expenses");
 
-const instance = axios.create({
-    baseURL: apiUrl,
-    timeout: 10000,
-});
+function mapExpenseDoc(expenseDoc) {
+  const data = expenseDoc.data();
+  const rawDate = data.date ?? data.Date;
+
+  return {
+    id: expenseDoc.id,
+    description: data.description ?? data.Description ?? "",
+    amount: Number(data.amount ?? data.Amount ?? 0),
+    date: rawDate?.toDate ? rawDate.toDate() : new Date(rawDate),
+  };
+}
+
+function buildFirestoreErrorMessage(action, error) {
+  if (error?.code === "permission-denied") {
+    return "Firestore denied access. Update Firestore Rules or sign in a user.";
+  }
+
+  return `Failed to ${action}: ${error.message}`;
+}
 
 export async function storeExpense(expenseData) {
     try {
-        const res = await instance.post('/expenses.json', expenseData);
-        return { id: res.data.name, ...expenseData };
+    const res = await addDoc(expensesCollection, expenseData);
+    return { id: res.id, ...expenseData };
     } catch (error) {
         console.error('Error storing expense:', error);
-        throw new Error('Failed to store expense: ' + error.message);
+    throw new Error(buildFirestoreErrorMessage('store expense', error));
     }
 }
 
 export async function fetchExpenses() {
-  console.log('Fetching expenses from API:', apiUrl);
     try {
-        const res = await instance.get('/expenses.json');
-
-        if (!res.data) return [];
-
-        return Object.keys(res.data).map((key) => ({
-            id: key,
-            ...res.data[key],
-            date: new Date(res.data[key].date),
-        }));
+    const snapshot = await getDocs(expensesCollection);
+    return snapshot.docs.map(mapExpenseDoc);
     } catch (error) {
         console.error('Error fetching expenses:', error);
-        throw new Error('Failed to fetch expenses: ' + error.message);
+    throw new Error(buildFirestoreErrorMessage('fetch expenses', error));
     }
 }
 
 export async function updateExpense(id, expenseData) {
     try {
-        await instance.put(`/expenses/${id}.json`, expenseData);
+    await updateDoc(doc(db, "expenses", id), expenseData);
         return { id, ...expenseData };
     } catch (error) {
         console.error('Error updating expense:', error);
-        throw new Error('Failed to update expense: ' + error.message);
+    throw new Error(buildFirestoreErrorMessage('update expense', error));
     }
 }
 
@@ -51,19 +67,25 @@ export async function deleteExpense(id) {
   }
 
   try {
-    await instance.delete(`/expenses/${id}.json`);
+    await deleteDoc(doc(db, "expenses", id));
     return id;
   } catch (error) {
-    console.error(
-      'Error deleting expense:',
-      error.response?.status,
-      error.response?.data
-    );
-
-    throw new Error(
-      error.response?.data?.message ||
-      error.message ||
-      'Failed to delete expense'
-    );
+    console.error('Error deleting expense:', error);
+    throw new Error(buildFirestoreErrorMessage('delete expense', error));
   }
+}
+
+export function subscribeExpenses(onData, onError) {
+  return onSnapshot(
+    expensesCollection,
+    (snapshot) => {
+      const expenses = snapshot.docs.map(mapExpenseDoc);
+      onData(expenses);
+    },
+    (error) => {
+      if (onError) {
+        onError(new Error(buildFirestoreErrorMessage('subscribe expenses', error)));
+      }
+    }
+  );
 }

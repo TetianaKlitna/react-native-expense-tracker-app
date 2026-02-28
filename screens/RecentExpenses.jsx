@@ -5,18 +5,21 @@ import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { getDateMinusDays } from "../util/date";
 import { useExpenses } from "../hooks";
 import { ExpensesContext } from "../store/expenses-context";
+import { subscribeExpenses } from "../services/expense.api";
 
 function RecentExpenses() {
   const expensesCtx = useContext(ExpensesContext);
-  const { get, loading, error } = useExpenses();
+  const { loading, error } = useExpenses();
 
   useEffect(() => {
-    const fetchExpenses = async () => {
-      const expenses = await get();
+    const unsubscribe = subscribeExpenses(
+      (expenses) => {
       expensesCtx.setExpenses(expenses);
-    };
+      },
+      () => {}
+    );
 
-    fetchExpenses();
+    return unsubscribe;
   }, []);
 
   const recentExpenses = expensesCtx.expenses.filter((expense) => {

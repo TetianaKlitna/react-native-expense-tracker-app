@@ -84,7 +84,7 @@ function ExpenseForm({ defaultExpense, onCancel, onConfirm, confirmLabel }) {
                     style={styles.rowInput} />
             </View>
             <Input
-                label="Description111"
+                label="Description"
                 invalid={!inputValues.description.isValid}
                 TextInputConfig={{
                     multiline: true,
