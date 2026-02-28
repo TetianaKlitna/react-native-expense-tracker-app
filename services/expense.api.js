@@ -4,7 +4,6 @@ import {
   deleteDoc,
   doc,
   getDocs,
-  onSnapshot,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "./firebase.config";
@@ -34,7 +33,7 @@ function buildFirestoreErrorMessage(action, error) {
 export async function storeExpense(expenseData) {
     try {
     const res = await addDoc(expensesCollection, expenseData);
-    return { id: res.id, ...expenseData };
+    //return { id: res.id, ...expenseData };
     } catch (error) {
         console.error('Error storing expense:', error);
     throw new Error(buildFirestoreErrorMessage('store expense', error));
@@ -75,17 +74,3 @@ export async function deleteExpense(id) {
   }
 }
 
-export function subscribeExpenses(onData, onError) {
-  return onSnapshot(
-    expensesCollection,
-    (snapshot) => {
-      const expenses = snapshot.docs.map(mapExpenseDoc);
-      onData(expenses);
-    },
-    (error) => {
-      if (onError) {
-        onError(new Error(buildFirestoreErrorMessage('subscribe expenses', error)));
-      }
-    }
-  );
-}

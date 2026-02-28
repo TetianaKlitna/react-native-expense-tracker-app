@@ -1,26 +1,35 @@
-import { useEffect, useContext } from "react";
+import { useCallback, useContext } from "react";
 import { Text } from "react-native";
-import LoadingSpinner from '../ui/LoadingSpinner';
+import { useFocusEffect } from '@react-navigation/native';
+import LoadingOverlay from '../ui/LoadingOverlay';
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { getDateMinusDays } from "../util/date";
 import { useExpenses } from "../hooks";
 import { ExpensesContext } from "../store/expenses-context";
-import { subscribeExpenses } from "../services/expense.api";
 
 function RecentExpenses() {
   const expensesCtx = useContext(ExpensesContext);
-  const { loading, error } = useExpenses();
+  const { loading, error, get } = useExpenses();
+  const getExpenses = useCallback(get, []);
 
-  useEffect(() => {
-    const unsubscribe = subscribeExpenses(
-      (expenses) => {
-      expensesCtx.setExpenses(expenses);
-      },
-      () => {}
-    );
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-    return unsubscribe;
-  }, []);
+      const loadExpenses = async () => {
+        const expenses = await getExpenses();
+        if (isActive) {
+          expensesCtx.setExpenses(expenses);
+        }
+      };
+
+      loadExpenses();
+
+      return () => {
+        isActive = false;
+      };
+    }, [getExpenses, expensesCtx.setExpenses])
+  );
 
   const recentExpenses = expensesCtx.expenses.filter((expense) => {
     const today = new Date();
@@ -28,7 +37,7 @@ function RecentExpenses() {
   });
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingOverlay />;
   }
 
   if (error) {

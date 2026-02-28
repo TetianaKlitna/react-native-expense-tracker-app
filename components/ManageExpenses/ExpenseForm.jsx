@@ -5,7 +5,7 @@ import { getFormattedDate } from '../../util/date';
 import Input from './Input';
 import Button from '../../ui/Button';
 
-function ExpenseForm({ defaultExpense, onCancel, onConfirm, confirmLabel }) {
+function ExpenseForm({ defaultExpense, onCancel, onConfirm, confirmLabel, disabled = false }) {
 
     const [inputValues, setInputValues] = useState({
         amount: {
@@ -98,7 +98,7 @@ function ExpenseForm({ defaultExpense, onCancel, onConfirm, confirmLabel }) {
 
             <View style={styles.buttonsContainer}>
                 <Button onPress={onCancel} mode="flat" style={styles.button}>Cancel</Button>
-                <Button onPress={onSubmit} style={styles.button}>{confirmLabel}</Button>
+                <Button onPress={onSubmit} style={styles.button} disabled={disabled}>{confirmLabel}</Button>
             </View>
         </View>
     );

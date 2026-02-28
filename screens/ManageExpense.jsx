@@ -5,14 +5,14 @@ import IconButton from '../ui/IconButton';
 import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpenses/ExpenseForm';
 import { useExpenses } from '../hooks';
-import LoadingSpinner from '../ui/LoadingSpinner';
+import LoadingOverlay from '../ui/LoadingOverlay';
 
 function ManageExpense({ route, navigation }) {
     const { expenseId } = route.params || {};
     const isEditing = !!expenseId;
 
     const expensesCtx = useContext(ExpensesContext);
-    const { create, remove, update, loading, error } = useExpenses();
+    const { create, remove, update, get, loading, error } = useExpenses();
 
     const expense = expensesCtx.expenses.find(
         (expense) => expense.id === expenseId
@@ -25,25 +25,30 @@ function ManageExpense({ route, navigation }) {
     }, [navigation, isEditing]);
 
     const deleteExpenseHandler = async () => {
+            if (loading) return;
             await remove(expenseId);
-            expensesCtx.deleteExpense(expenseId);
+            const expenses = await get();
+            expensesCtx.setExpenses(expenses);
             navigation.goBack();
     };
 
     const confirmHandler = async (expenseData) => {
+        if (loading) return;
+
         if (isEditing) {
-            const updatedExpense = await update(expenseId, expenseData);
-            expensesCtx.updateExpense(expenseId, updatedExpense);
+            await update(expenseId, expenseData);
         } else {
-            const createdExpense = await create(expenseData);
-            expensesCtx.addExpense(createdExpense);
+            await create(expenseData);
         }
+
+        const expenses = await get();
+        expensesCtx.setExpenses(expenses);
 
         navigation.goBack();
     };
 
     if (loading) {
-        return <LoadingSpinner />;
+        return <LoadingOverlay />;
     }
 
     if (error) {
@@ -57,6 +62,7 @@ function ManageExpense({ route, navigation }) {
                 onCancel={() => navigation.goBack()}
                 onConfirm={confirmHandler}
                 confirmLabel={isEditing ? 'Edit' : 'Add'}
+                disabled={loading}
             />
 
             {isEditing && (

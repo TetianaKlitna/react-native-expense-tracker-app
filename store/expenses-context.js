@@ -1,4 +1,4 @@
-import { createContext, useReducer } from "react";
+import { createContext, useReducer, useCallback } from "react";
 
 
 export const ExpensesContext = createContext({
@@ -33,21 +33,21 @@ function expensesReducer(state, action) {
 function ExpensesContextProvider({ children }) {
     const [expensesState, dispatch] = useReducer(expensesReducer, []);
 
-    const addExpense = ({ description, amount, date }) => {
+    const addExpense = useCallback(({ description, amount, date }) => {
         dispatch({ type: 'ADD', payload: { description, amount, date } });
-    };
+    }, []);
 
-    const updateExpense = (id, { description, amount, date }) => {
+    const updateExpense = useCallback((id, { description, amount, date }) => {
         dispatch({ type: 'UPDATE', payload: { id, description, amount, date } });
-    };
+    }, []);
 
-    const deleteExpense = (id) => {
+    const deleteExpense = useCallback((id) => {
         dispatch({ type: 'DELETE', payload: { id } });
-    };
+    }, []);
 
-    const setExpenses = (expenses) => {
+    const setExpenses = useCallback((expenses) => {
         dispatch({ type: 'SET', payload: expenses });
-    };
+    }, []);
 
     return (
         <ExpensesContext.Provider value={{
