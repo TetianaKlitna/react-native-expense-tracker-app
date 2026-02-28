@@ -6,13 +6,14 @@ import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpenses/ExpenseForm';
 import { useExpenses } from '../hooks';
 import LoadingOverlay from '../ui/LoadingOverlay';
+import ErrorOverlay from '../ui/ErrorOverlay';
 
 function ManageExpense({ route, navigation }) {
     const { expenseId } = route.params || {};
     const isEditing = !!expenseId;
 
     const expensesCtx = useContext(ExpensesContext);
-    const { create, remove, update, get, loading, error } = useExpenses();
+    const { create, remove, update, get, loading, error, setError } = useExpenses();
 
     const expense = expensesCtx.expenses.find(
         (expense) => expense.id === expenseId
@@ -52,7 +53,7 @@ function ManageExpense({ route, navigation }) {
     }
 
     if (error) {
-        return <Text>Error: {error.message}</Text>;
+        return <ErrorOverlay message="An error occurred while processing your data!" onConfirm={() => setError(null)} />;
     }
 
     return (

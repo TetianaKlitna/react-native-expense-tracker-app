@@ -7,7 +7,7 @@ import {
 } from '../services/expense.api';
 
 export function useExpenses() {
-  const { loading, error, run } = useAsync();
+  const { loading, error, setError, run } = useAsync();
 
   return {
     loading,

@@ -1,7 +1,7 @@
 import { useCallback, useContext } from "react";
-import { Text } from "react-native";
 import { useFocusEffect } from '@react-navigation/native';
 import LoadingOverlay from '../ui/LoadingOverlay';
+import ErrorOverlay from '../ui/ErrorOverlay';
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { getDateMinusDays } from "../util/date";
 import { useExpenses } from "../hooks";
@@ -9,7 +9,7 @@ import { ExpensesContext } from "../store/expenses-context";
 
 function RecentExpenses() {
   const expensesCtx = useContext(ExpensesContext);
-  const { loading, error, get } = useExpenses();
+  const { loading, error, setError, get } = useExpenses();
   const getExpenses = useCallback(get, []);
 
   useFocusEffect(
@@ -41,7 +41,7 @@ function RecentExpenses() {
   }
 
   if (error) {
-    return <Text>Error loading expenses</Text>;
+    return <ErrorOverlay message="Could not load expenses!" onConfirm={() => setError(null)} />;
   }
 
   return <ExpensesOutput 

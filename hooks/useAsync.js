@@ -18,5 +18,5 @@ export function useAsync() {
     }
   };
 
-  return { loading, error, run };
+  return { loading, error, setError,run };
 }

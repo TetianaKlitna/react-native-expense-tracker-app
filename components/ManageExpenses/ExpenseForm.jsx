@@ -44,8 +44,6 @@ function ExpenseForm({ defaultExpense, onCancel, onConfirm, confirmLabel, disabl
             description: inputValues.description.value,
         };
 
-        console.log(formattedExpense);
-
         onConfirm(formattedExpense);
 
     }
