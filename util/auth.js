@@ -10,7 +10,7 @@ async function createUser(email, password) {
       email,
       password
     );
-    return userCredential.user;
+    return userCredential.user.getIdToken();
   } catch (error) {
     throw error;
   }
@@ -23,7 +23,7 @@ async function loginUser(email, password) {
         email,
         password
     );
-    return userCredential.user;
+    return userCredential.user.getIdToken();
   } catch (error) {
     throw error;
   }
