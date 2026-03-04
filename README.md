@@ -1,6 +1,6 @@
                                                       Expense Tracker Mobile App
 
-I recently built a mobile Expense Tracker application to improve my skills in React Native and modern full-stack mobile development.
+A mobile Expense Tracker application to improve my skills in React Native and modern full-stack mobile development.
 The app allows users to track expenses, manage spending categories, and securely store data in the cloud with authentication.
 
 🛠 Technologies Used:
