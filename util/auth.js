@@ -1,7 +1,5 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { app } from '../services/firebase.config';
-
-const auth = getAuth(app);
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../services/firebase.config';
 
 async function createUser(email, password) {
   try {
